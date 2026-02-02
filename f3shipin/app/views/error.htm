@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错误页面 - {{ @config.site_title }}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="//cdn.staticfile.org/bootstrap/4.6.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="//cdn.staticfile.org/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center min-vh-100 align-items-center py-5">
+            <div class="col-md-8 col-lg-6">
+                
+                <!-- 错误图标 -->
+                <div class="text-center mb-4">
+                    <div class="error-icon">
+                        <i class="fas {{ 
+                            @code == 404 ? 'fa-exclamation-triangle text-warning' : 
+                            @code == 500 ? 'fa-bug text-danger' : 
+                            'fa-exclamation-circle text-danger' 
+                        }} fa-4x"></i>
+                    </div>
+                </div>
+                
+                <!-- 错误信息 -->
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body text-center p-5">
+                        <h1 class="display-4 text-danger mb-3">{{ @code }}</h1>
+                        <h4 class="mb-4">
+                            {{ 
+                                @code == 404 ? '页面未找到' :
+                                @code == 500 ? '服务器内部错误' :
+                                @code == 403 ? '访问被禁止' :
+                                @code == 401 ? '需要登录' :
+                                '发生了错误'
+                            }}
+                        </h4>
+                        
+                        <p class="text-muted mb-4">
+                            {{ @message ?: (
+                                @code == 404 ? '抱歉，您访问的页面不存在或已被移除。' :
+                                @code == 500 ? '服务器遇到了一个意外错误，请稍后重试。' :
+                                @code == 403 ? '您没有权限访问此页面。' :
+                                @code == 401 ? '您需要登录后才能访问此页面。' :
+                                '发生了未知错误，请联系我们处理。'
+                            ) }}
+                        </p>
+                        
+                        <!-- 快捷操作 -->
+                        <div class="btn-group" role="group">
+                            <button onclick="history.back()" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left"></i> 返回上一页
+                            </button>
+                            <a href="{@BASE}" class="btn btn-primary">
+                                <i class="fas fa-home"></i> 回到首页
+                            </a>
+                            <button onclick="location.reload()" class="btn btn-outline-secondary">
+                                <i class="fas fa-sync-alt"></i> 刷新页面
+                            </button>
+                        </div>
+                        
+                        <!-- 联系人信息 -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                如果问题持续存在，请联系网站管理员
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="//cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        // 记录错误日志（生产环境）
+        if ({{ @code }} >= 500) {
+            console.error('Server error {{ @code }}: {{ @message }}');
+        }
+        
+        // 自动刷新机制（针对某些错误）
+        setTimeout(function() {
+            if ({{ @code }} == 500) {
+                console.log('建议用户稍后重试...');
+            }
+        }, 3000);
+    </script>
+    
+    <style>
+        .error-icon {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+        }
+        
+        @keyframes shake {
+            10%, 90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+            20%, 80% {
+                transform: translate3d(2px, 0, 0);
+            }
+            30%, 50%, 70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+            40%, 60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+        
+        .min-vh-100 {
+            min-height: 100vh;
+        }
+    </style>
+</body>
+</html>

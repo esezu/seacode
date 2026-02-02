@@ -1,0 +1,10 @@
+<check if="!empty(@categories)">
+    <div class="categories-bar">
+        <repeat group="{{ @categories }}" key="{{ @id }}" value="{{ @name }}">
+            <a href="{{ @BASEURL }}/type/{{ @id }}"
+               class="category-tag {{ @type_id == @id ? 'active' : '' }}">
+                {{ @name }}
+            </a>
+        </repeat>
+    </div>
+</check>

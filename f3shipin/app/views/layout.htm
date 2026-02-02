@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ @config.site_title }} - {{ @title }}</title>
+    <meta name="description" content="免费观看最新影视视频，支持M3U8在线播放器">
+    <meta name="keywords" content="影视,视频,M3U8,在线播放器">
+    
+    <!-- Bootstrap CSS -->
+    <link href="//cdn.staticfile.org/bootstrap/4.6.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="//cdn.staticfile.org/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link href="{{ @config.base_url }}/public/css/style.css" rel="stylesheet">
+    
+    <!-- SEO优化 -->
+    <link rel="canonical" href="{{ BASE_URL }}/{{ $_SERVER['REQUEST_URI'] }}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ @config.base_url }}/">
+                <i class="fas fa-play-circle"></i> {{ @config.site_title }}
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item {{ $_SERVER['REQUEST_URI'] == @config.base_url . '/' ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ @config.base_url }}/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ @config.base_url }}/list">全部视频</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                            分类浏览
+                        </a>
+                        <div class="dropdown-menu">
+                            <repeat group="@categories" value="@category">
+                                <a class="dropdown-item" href="{{ @config.base_url }}/category/{{ @category.id }}">
+                                    {{ @category.name }}
+                                </a>
+                            </repeat>
+                        </div>
+                    </li>
+                </ul>
+                
+                <!-- 搜索框 -->
+                <form class="form-inline my-2 my-lg-0" method="get" action="{{ @config.base_url }}/search" onsubmit="return validateSearch(this)">
+                    <div class="input-group">
+                        <input class="form-control" type="search" name="q" placeholder="搜索影视..." 
+                               value="{{ @_GET.q }}" required minlength="2">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-light" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="container mt-4">
+        <!-- 消息提示 -->
+        <check if="{{ isset(@msg) }}">
+            <div class="alert alert-info alert-dismissible fade show">
+                {{ @msg | raw }}
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
+        </check>
+
+        <!-- 主要内容 -->
+        <div id="content">
+            {{ @content }}
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-video"></i> {{ @config.site_title }}</h5>
+                    <p class="text-muted">提供最新最全的影视视频在线观看服务</p>
+                </div>
+                <div class="col-md-6 text-md-right">
+                    <p class="mb-0">© {{ date('Y') }} {{ @config.site_title }}. All rights reserved.</p>
+                    <small class="text-muted">本网站仅用于学习交流，所有内容均来自网络公开资源</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="btn btn-primary btn-sm rounded-circle position-fixed" 
+            style="bottom: 20px; right: 20px; display: none; z-index: 1000;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script src="//cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <script src="//cdn.staticfile.org/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 自定义JavaScript -->
+    <script src="{{ @config.base_url }}/public/js/main.js"></script>
+    
+    <!-- 分析代码（可选）-->
+    <check if="{{ @DEBUG < 3 }}">
+    <!-- 只在生产环境加载 -->
+    <script>
+        // 可以添加统计代码
+    </script>
+    </check>
+
+    <script>
+        // 搜索引擎优化和安全相关
+        document.addEventListener('DOMContentLoaded', function() {
+            // 防止框架注入
+            if (top !== self) {
+                top.location = self.location;
+            }
+            
+            // CSRF保护（如果需要处理表单）
+            $.ajaxSetup({
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+        });
+    </script>
+</body>
+</html>

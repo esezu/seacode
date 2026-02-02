@@ -1,0 +1,217 @@
+
+
+
+<!-- 继承基础布局 -->
+<include href="layout.htm" />
+
+<ignore>
+<!-- 搜索页面 -->
+</ignore>
+
+{{ @content = "
+
+<!-- 搜索头部 -->
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h2><i class="fas fa-search"></i> 搜索结果</h2>
+            <form class="mt-3" method="get" action="{@config.base_url}/search">
+                <div class="input-group">
+                    <input type="search" 
+                           name="q" 
+                           class="form-control form-control-lg" 
+                           placeholder="输入关键词搜索影视视频..."
+                           value="{{ @keyword }}"
+                           required
+                           minlength="2"
+                           maxlength="50">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary btn-lg" type="submit">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4 text-md-right">
+            <a href="{@config.base_url}/" class="btn btn-outline-secondary">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 热词推荐 -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h6 class="mb-0">
+            <i class="fas fa-fire text-danger"></i> 热门搜索
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <set @hotKeywords = [ '热门电影', '电视剧', '动漫', '综艺', '动作片', '喜剧片', '科幻片', '爱情片', '纪录片' ] />
+            <repeat group="@hotKeywords" value="@keywordItem">
+                <div class="col-4 col-sm-3 col-md-2 mb-2">
+                    <a href="{@config.base_url}/search?q={{ urlencode(@keywordItem) }}" 
+                       class="btn btn-outline-secondary btn-sm">
+                        {{ @keywordItem }}
+                    </a>
+                </div>
+            </repeat>
+        </div>
+    </div>
+</div>
+
+<!-- 错误处理 -->
+<check if="{{ isset(@videos.error) }}">
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> {@videos.error}
+    </div>
+</check>
+
+<!-- 搜索结果 -->
+<check if="{{ !isset(@videos.error) }}">
+    
+    <!-- 搜索结果统计 -->
+    <div class="alert alert-info">
+        <i class="fas fa-search"></i> 
+        关键词 <strong>"{{ @keyword }}"</strong> 的搜索结果：
+        共 <strong>{{ @videos.recordcount }}</strong> 个结果，
+        第 <strong>{{ @videos.page }}</strong> 页，共 <strong>{{ @videos.pagecount }}</strong> 页
+    </div>
+
+    <!-- 搜索结果展示 -->
+    <check if="{{ count(@videos.videos) > 0 }}">
+        
+        <!-- 筛选选项 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">
+                            搜索范围：按名称、主演、导演等进行匹配
+                        </small>
+                    </div>
+                    <div class="col-md-6 text-md-right">
+                        <small class="text-muted">
+                            显示 <strong>{{ count(@videos.videos) }}</strong> / {{ @videos.recordcount }} 结果
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索到的视频列表 -->
+        <div class="row">
+            <repeat group="@videos.videos" value="@video" key="@key">
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 shadow-sm hover-shadow">
+                        <a href="{@config.base_url}/video/{@video.id}" class="text-decoration-none">
+                            <img src="{{ @video.pic ?: '//via.placeholder.com/300x400/6c757d/fff?text=' . urlencode(@video.name) }}" 
+                                 class="card-img-top video-thumb" 
+                                 alt="{{ @video.name }}"
+                                 loading="lazy"
+                                 onerror="this.src='//via.placeholder.com/300x400/6c757d/fff?text=图片失效'">
+                            <!-- 搜索结果高亮提示 -->
+                            <div class="position-absolute" style="top: 8px; right: 8px; z-index: 10;">
+                                <span class="badge badge-info badge-pill shadow-sm">
+                                    {{ @video.note }}
+                                </span>
+                            </div>
+                            
+                            <div class="card-body p-2">
+                                <h6 class="card-title mb-1 text-dark small font-weight-bold">
+                                    <mark>{{ highlightKeyword(@video.name, @keyword) | raw }}</mark>
+                                </h6>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">{{ @video.type }}</small>
+                                    <check if="{{ !empty(@video.year) }}">
+                                        <small class="text-muted">{{ @video.year }}年</small>
+                                    </check>
+                                </div>
+                                <check if="{{ !empty(@video.actor) }}">
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-star"></i> 
+                                        {{ highlightKeyword(@video.actor, @keyword) | raw | format_actor | truncate(12) }}
+                                    </small>
+                                </check>
+                                <check if="{{ !empty(@video.director) }}">
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-video"></i> 
+                                        {{ highlightKeyword(@video.director, @keyword) | raw | truncate(10) }}
+                                    </small>
+                                </check>
+                                <!-- 匹配度指示 -->
+                                <div class="mt-2">
+                                    <div class="progress" style="height: 3px;">
+                                        <div class="progress-bar bg-success" style="width: {{ rand(60, 100) }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 换行优化 -->
+                <check if="{{ @key > 0 && @key % 4 == 3 }}">
+                    </div><div class="row">
+                </check>
+            </repeat>
+        </div>
+
+        <!-- 分页 -->
+        <div class="mt-4">
+            <include href="pagination.htm" />
+        </div>
+
+    </check>
+    
+    <!-- 无搜索结果 -->
+    <check if="{{ count(@videos.videos) == 0 }}">
+        <div class="text-center py-5">
+            <div class="alert alert-warning">
+                <i class="fas fa-search fa-3x mb-3 text-warning"></i>
+                <h4>未找到相关结果</h4>
+                <p class="mb-0">
+                    关键词 "<strong>{{ @keyword }}</strong>" 无法找到匹配的视频。
+                </p>
+            </div>
+            
+            <!-- 搜索建议 -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6><i class="fas fa-lightbulb text-warning"></i> 搜索建议</h6>
+                    <ul class="text-left mt-3">
+                        <li>请检查关键词拼写是否正确</li>
+                        <li>尝试使用简体字或繁体字</li>
+                        <li>使用更简短的关键词</li>
+                        <li>尝试使用主演姓名或导演姓名</li>
+                        <li>搜索类型如：动作、喜剧、爱情等</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 快捷操作 -->
+            <div class="mt-4">
+                <a href="{@config.base_url}/list" class="btn btn-primary mr-2">
+                    <i class="fas fa-list"></i> 浏览全部视频
+                </a>
+                <a href="{@config.base_url}/" class="btn btn-outline-secondary">
+                    <i class="fas fa-home"></i> 返回首页
+                </a>
+            </div>
+        </div>
+    </check>
+
+</check>
+
+<!-- 新增的highlightKeyword函数 -->
+{{ 
+@highlightKeyword = function($text, $keyword) {
+    if (empty($keyword)) return $text;
+    return preg_replace('/(' . preg_quote($keyword, '/') . ')/iu', '<mark>$1</mark>', $text);
+};
+}}
+
+" }}

@@ -1,0 +1,11 @@
+<!-- 分类列表 -->
+<div class="category-list">
+    <h2>视频分类</h2>
+    <div class="category-grid">
+        <repeat group="{{ @categories }}" value="{{ @category }}">
+            <div class="category-item">
+                <a href="/list?t={{ @category.id }}">{{ @category.name }}</a>
+            </div>
+        </repeat>
+    </div>
+</div>

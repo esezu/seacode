@@ -1,0 +1,125 @@
+<!-- 继承基础布局 -->
+<include href="layout.htm" />
+
+<ignore>
+<!-- 首页 - 最新视频列表 -->
+</ignore>
+
+{{ @content = "
+
+<!-- 轮播图区域 -->
+<div class="jumbotron jumbotron-fluid bg-gradient text-white mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <h1 class="display-4">最新影视资源</h1>
+        <p class="lead">免费观看全网最新最热影视视频，支持手机电脑在线播放</p>
+        <hr class="my-4">
+        <p>M3U8高清播放，无需下载，即点即播</p>
+    </div>
+</div>
+
+<!-- 快速分类导航 -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-th-list"></i> 快速分类</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <repeat group="@categories" value="@category" key="@key">
+                <check if="{{ @key < 12 }}">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                        <a href='{@config.base_url}/category/{@category.id}' class="btn btn-outline-primary btn-block btn-sm">
+                            {~category.name~}
+                        </a>
+                    </div>
+                </check>
+            </repeat>
+        </div>
+    </div>
+</div>
+
+<!-- 最新视频列表 -->
+<check if="{{ isset(@videos.error) }}">
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> {@videos.error}
+    </div>
+</check>
+
+<check if="{{ !isset(@videos.error) && count(@videos.videos) > 0 }}">
+    <!-- 视频统计 -->
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> 
+        共找到 <strong>{{ @videos.recordcount }}</strong> 个视频，
+        当前第 <strong>{{ @videos.page }}</strong> 页，共 <strong>{{ @videos.pagecount }}</strong> 页
+    </div>
+    
+    <!-- 视频网格 -->
+    <div class="row">
+        <repeat group="@videos.videos" value="@video">
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4">
+                <div class="card h-100 shadow-sm hover-shadow">
+                    <a href='{@config.base_url}/video/{@video.id}' class="text-decoration-none">
+                        <img src="{{ @video.pic ?: '//via.placeholder.com/300x400/ccc/fff?text=暂无图片' }}" 
+                             class="card-img-top video-thumb" alt="{{ @video.name }}" loading="lazy">
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-1 text-dark small font-weight-bold">
+                                {{ @video.name | truncate(15) }}
+                            </h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ @video.type }}</small>
+                                <span class="badge badge-success">{{ @video.note }}</span>
+                            </div>
+                            <check if="{{ !empty(@video.actor) }}">
+                                <small class="text-muted d-block mt-1">
+                                    {{ @video.actor | format_actor | truncate(12) }}
+                                </small>
+                            </check>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <check if="{{ @video.id % 6 == 0 }}">
+                </div><div class="row">
+            </check>
+        </repeat>
+    </div>
+    
+    <!-- 分页控件 -->
+    <check if="{{ @videos.pagecount > 1 }}">
+        <nav aria-label="视频分页">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {{ @videos.page <= 1 ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ @config.base_url }}/?pg={{ @videos.page - 1 }}" 
+                       aria-label="上一页">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                
+                <set $startPage = max(1, @videos.page - 5) />
+                <set $endPage = min(@videos.pagecount, @videos.page + 5) />
+                
+                <loop from="{{ @startPage }}" to="{{ @endPage }}" value="@i">
+                    <li class="page-item {{ @i == @videos.page ? 'active' : '' }}">
+                        <a class="page-link" href="{{ @config.base_url }}/?pg={{ @i }}">{{ @i }}</a>
+                    </li>
+                </loop>
+                
+                <li class="page-item {{ @videos.page >= @videos.pagecount ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ @config.base_url }}/?pg={{ @videos.page + 1 }}" 
+                       aria-label="下一页">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </check>
+
+<check if="{{ count(@videos.videos) == 0 }}">
+    <div class="text-center py-5">
+        <i class="fas fa-video-slash fa-3x text-muted mb-3"></i>
+        <h5>暂无视频数据</h5>
+        <p class="text-muted">请稍后再试或联系管理员</p>
+    </div>
+</check>
+</check>
+
+" }}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="IE=edge" >
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+  <title>DPlayer播放器</title>
+  <!-- 修复：指定DPlayer具体版本，避免兼容性风险 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dplayer@1.27.1/dist/DPlayer.min.css" />
+  <style type="text/css">
+    body,html{background-color:#000;padding: 0;margin: 0;width:100%;height:100%;}
+    #dplayer{width:100%;height:100%;padding:0;margin:0;display:block;}
+    /* 新增：错误提示样式，无有效链接时显示 */
+    .tip {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 16px;
+      text-align: center;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+<!-- 新增：错误/提示信息容器 -->
+<div class="tip" id="tipBox" style="display: none;"></div>
+<div id="dplayer" class="dplayer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.14/dist/hls.min.js"></script>
+<!-- 修复：指定DPlayer具体版本，和Hls.js版本匹配 -->
+<script src="https://cdn.jsdelivr.net/npm/dplayer@1.27.1/dist/DPlayer.min.js"></script>
+<script type="text/javascript">
+function getParameterByName(name) {
+  var urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+// 新增：获取提示容器
+const tipBox = document.getElementById('tipBox');
+let dp = null;
+let m3u8Url = '';
+
+try {
+  // 修复：捕获decodeURIComponent的潜在异常，避免脚本中断
+  const rawUrl = getParameterByName('url') || '';
+  m3u8Url = rawUrl ? decodeURIComponent(rawUrl) : '';
+} catch (e) {
+  tipBox.style.display = 'block';
+  tipBox.innerHTML = '<span style="color: #ff4444;">链接解码失败！</span>请检查url参数是否合法。';
+  console.error('链接解码异常：', e);
+}
+
+// 修复：判断url是否有效，避免初始化失败
+if (m3u8Url) {
+  dp = new DPlayer({
+      container: document.getElementById('dplayer'),
+      autoplay: true,
+      theme: '#00adee',
+      loop: false,
+      lang: 'zh-cn',
+      // 修复：关闭m3u8不支持的截图功能
+      screenshot: false,
+      hotkey: true,
+      preload: 'auto',
+      volume: 0.7,
+      video: {
+          url: m3u8Url,
+          type: 'hls',
+          // 修复：添加跨域配置，提升第三方m3u8播放兼容性
+          cors: true
+      }
+  });
+
+  // 新增：播放错误监听，方便排障，提升用户体验
+  dp.on('error', function(err) {
+    console.error('播放器播放错误：', err);
+    tipBox.style.display = 'block';
+    tipBox.innerHTML = '<span style="color: #ff4444;">播放失败！</span>请检查m3u8链接是否有效，或是否存在跨域限制。';
+  });
+} else {
+  // 修复：无有效url时，显示清晰的使用说明
+  tipBox.style.display = 'block';
+  tipBox.innerHTML = '<span style="color: #ff4444;">未检测到有效播放链接！</span><br>使用方法：在页面URL后添加 ?url=你的m3u8播放链接<br>示例：DPlayer.html?url=https://example.com/xxx.m3u8';
+}
+</script>
+</body>
+</html>

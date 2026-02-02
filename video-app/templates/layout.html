@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ @title | @site_name }}</title>
+    <link rel="stylesheet" href="{{ @BASEURL }}/public/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-inner">
+                <h1 class="logo">
+                    <a href="{{ @BASEURL }}/">{{ @site_name }}</a>
+                </h1>
+                <nav class="nav">
+                    <a href="{{ @BASEURL }}/" class="{{ @page == 1 && empty(@type_id) ? 'active' : '' }}">首页</a>
+                    <a href="{{ @BASEURL }}/category" class="nav-categories">全部分类</a>
+                </nav>
+                <div class="search-box">
+                    <form action="{{ @BASEURL }}/search" method="GET">
+                        <input type="text" name="wd" placeholder="搜索视频..." value="{{ @keyword | '' }}">
+                        <button type="submit">搜索</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <include if="isset(@categories)" href="categories.html"/>
+            <check if="isset(@video)">
+                <include href="detail-content.html"/>
+            <else/>
+                <include href="list-content.html"/>
+            </check>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{ @site_name }}. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ @BASEURL }}/public/js/main.js"></script>
+</body>
+</html>

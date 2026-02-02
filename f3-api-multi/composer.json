@@ -1,0 +1,14 @@
+{
+    "name": "trae/f3-api-multi",
+    "description": "Multi-API switcher using Fat-Free Framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Trae AI"
+        }
+    ],
+    "require": {
+        "bcosca/fatfree-core": "^3.9"
+    }
+}

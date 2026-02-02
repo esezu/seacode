@@ -1,0 +1,16 @@
+{
+    "name": "f3-shipin/video-app",
+    "description": "基于 Fat-Free Framework 的影视视频程序",
+    "type": "project",
+    "require": {
+        "php": ">=7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

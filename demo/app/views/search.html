@@ -1,0 +1,115 @@
+<include href="layout.html" with="content=true">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+        <i class="bi bi-search"></i> 搜索结果: "{{ @searchKeyword }}"
+    </h2>
+</div>
+
+<!-- 分类筛选 -->
+<F3:check if="{{ @categories }}">
+    <div class="category-list">
+        <F3:repeat group="{{ @categories }}" value="{{ @cat }}">
+            <a href="{{ @BASE }}/category/{{ @cat.id }}" class="category-btn">
+                {{ @cat.name }}
+            </a>
+        </F3:repeat>
+    </div>
+</F3:check>
+
+<!-- 视频列表 -->
+<F3:check if="{{ @videos }}">
+    <div class="alert alert-info alert-custom">
+        <i class="bi bi-info-circle-fill"></i>
+        找到 {{ @pagination.recordcount }} 个结果
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+        <F3:repeat group="{{ @videos }}" value="{{ @video }}">
+            <div class="col">
+                <div class="card video-card">
+                    <a href="{{ @BASE }}/video/{{ @video.id }}">
+                        <F3:check if="{{ @video.pic }}">
+                            <img src="{{ @video.pic }}" alt="{{ @video.name }}">
+                        </F3:check>
+                        <F3:check if="{{ !@video.pic }}">
+                            <img src="https://via.placeholder.com/300x200/333/666?text=No+Image" alt="{{ @video.name }}">
+                        </F3:check>
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ @BASE }}/video/{{ @video.id }}" class="text-white text-decoration-none">
+                                {{ @video.name }}
+                            </a>
+                        </h5>
+                        <p class="card-text">
+                            <span class="badge">{{ @video.type }}</span>
+                        </p>
+                        <p class="card-text mb-0">
+                            <small>
+                                <i class="bi bi-clock"></i> {{ @video.note }}
+                                <F3:check if="{{ @video.last }}">
+                                    <br>
+                                    <i class="bi bi-calendar3"></i> {{ @video.last }}
+                                </F3:check>
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </F3:repeat>
+    </div>
+
+    <!-- 分页 -->
+    <F3:check if="{{ @pagination.pagecount > 1 }}">
+        <nav class="pagination-custom">
+            <ul class="pagination">
+                <li class="page-item {{ @pagination.page <= 1 ? 'disabled' : '' }}">
+                    <a class="page-link" href="?wd={{ @searchKeyword }}&pg={{ @pagination.page - 1 }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <F3:check if="{{ @pagination.page > 2 }}">
+                    <li class="page-item">
+                        <a class="page-link" href="?wd={{ @searchKeyword }}&pg=1">1</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                </F3:check>
+
+                <F3:repeat group="{{ range(max(1, @pagination.page - 1), min(@pagination.pagecount, @pagination.page + 1)) }}" value="{{ @page_num }}">
+                    <li class="page-item {{ @page_num == @pagination.page ? 'active' : '' }}">
+                        <a class="page-link" href="?wd={{ @searchKeyword }}&pg={{ @page_num }}">{{ @page_num }}</a>
+                    </li>
+                </F3:repeat>
+
+                <F3:check if="{{ @pagination.page < @pagination.pagecount - 1 }}">
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?wd={{ @searchKeyword }}&pg={{ @pagination.pagecount }}">{{ @pagination.pagecount }}</a>
+                    </li>
+                </F3:check>
+
+                <li class="page-item {{ @pagination.page >= @pagination.pagecount ? 'disabled' : '' }}">
+                    <a class="page-link" href="?wd={{ @searchKeyword }}&pg={{ @pagination.page + 1 }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </F3:check>
+</F3:check>
+
+<F3:check if="{{ !@videos }}">
+    <div class="text-center py-5">
+        <i class="bi bi-search" style="font-size: 4rem; color: #333;"></i>
+        <p class="mt-3 text-muted">未找到 "{{ @searchKeyword }}" 相关的视频</p>
+        <a href="{{ @BASE }}" class="btn btn-danger mt-3">
+            <i class="bi bi-arrow-left"></i> 返回首页
+        </a>
+    </div>
+</F3:check>

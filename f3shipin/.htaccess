@@ -1,0 +1,116 @@
+
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# 基本重写规则
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L,QSA]
+
+# 重定向到无斜杠版本 (SEO友好)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^(.+)/$
+RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+# HTTP到HTTPS重定向 (如果启用了SSL)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 阻止访问敏感目录
+RewriteRule ^config/ - [F,L]
+RewriteRule ^tmp/ - [F,L]
+RewriteRule ^logs/ - [F,L]
+RewriteRule ^\.git/ - [F,L]
+
+# 阻止访问特定文件类型
+RewriteRule \.(ini|log|bak|backup|sql|sh|py|exe)$ - [F,L]
+
+</IfModule>
+
+# 安全头设置
+<IfModule mod_headers.c>
+# 防止点击劫持
+Header set X-Frame-Options "SAMEORIGIN"
+
+# 防止MIME类型嗅探
+Header set X-Content-Type-Options "nosniff"
+
+# 启用XSS过滤器
+Header set X-XSS-Protection "1; mode=block"
+
+# HSTS (如果使用HTTPS)
+# Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+# 内容安全策略
+# Header set Content-Security-Policy "default-src 'self' cdn.staticfile.org; script-src 'self' 'unsafe-inline' cdn.staticfile.org; style-src 'self' 'unsafe-inline' cdn.staticfile.org; img-src 'self' data: https:; frame-src 'self';"
+
+# 跨域策略
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header set Access-Control-Allow-Headers "X-Requested-With, Content-Type, X-CSRF-Token"
+</IfModule>
+
+# Mimetype设置
+<IfModule mod_mime.c>
+AddType application/javascript .js
+AddType text/css .css
+AddType image/svg+xml .svg
+AddType application/json .json
+</IfModule>
+
+# 缓存控制
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType image/gif "access plus 1 month"
+ExpiresByType image/jpeg "access plus 1 month"
+ExpiresByType image/png "access plus 1 month"
+ExpiresByType image/svg+xml "access plus 1 month"
+ExpiresByType text/css "access plus 1 week"
+ExpiresByType application/javascript "access plus 1 week"
+ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# 压缩
+<IfModule mod_deflate.c>
+<IfModule mod_setenvif.c>
+<IfModule mod_headers.c>
+SetEnvIfNoCase ^(Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$ ^((gzip|deflate)\s*,?\s*)+|[X~-]{4,13}$ HAVE_Accept-Encoding
+RequestHeader append Accept-Encoding "gzip,deflate" env=HAVE_Accept-Encoding
+</IfModule>
+</IfModule>
+
+<FilesMatch "\.(js|css|html|htm|php|xml)$">
+SetOutputFilter DEFLATE
+</FilesMatch>
+</IfModule>
+
+# 禁止目录列表
+<IfModule mod_autoindex.c>
+Options -Indexes
+</IfModule>
+
+# 禁止特定浏览器访问 (可选)
+<IfModule mod_rewrite.c>
+RewriteCond %{HTTP_USER_AGENT} ^.*(bot|crawler|spider|scrapy).*$ [NC]
+RewriteRule .* - [F]
+</IfModule>
+
+# 允许的PHP设置
+<IfModule mod_php7.c>
+php_flag display_errors off
+php_flag log_errors on
+php_value error_log logs/php_errors.log
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 30
+php_value memory_limit 128M
+</IfModule>
+
+# 跨平台兼容 (IIS)
+<IfModule mod_headers.c>
+    # IIS兼容
+    Header unset Server
+</IfModule>
+
+

@@ -1,0 +1,39 @@
+<div class="video-detail">
+    <check if="{{ @video }}">
+        <h2>{{ @video.name }}</h2>
+        <p>当前播放：{{ @video.currentEpisode + 1 }}/{{ count(@video.playList) }}</p>
+        
+        <!-- 播放器 -->
+        <div class="player-container">
+            <check if="{{ @video.playerUrl }}">
+                <iframe src="{{ @video.playerUrl }}" allowfullscreen></iframe>
+            <false>
+                <div style="text-align: center; color: white; padding: 50px;">
+                    <h3>播放器加载失败</h3>
+                    <p>请检查网络连接或稍后再试</p>
+                </div>
+            </check>
+        </div>
+        
+        <!-- 播放列表 -->
+        <div class="play-list">
+            <h3>播放列表</h3>
+            <div class="items">
+                <check if="{{ @video.playList }}">
+                    <repeat group="{{ @video.playList }}" value="{{ @item }}" key="{{ @index }}">
+                        <a href="/play/{{ @video.id }}/{{ @index }}" class="item {{ @index == @video.currentEpisode ? 'active' : '' }}">
+                            {{ @item.name }}
+                        </a>
+                    </repeat>
+                <false>
+                    <p>暂无播放列表</p>
+                </check>
+            </div>
+        </div>
+    <false>
+        <div class="empty">
+            <h3>视频信息加载失败</h3>
+            <p>请稍后再试</p>
+        </div>
+    </check>
+</div>

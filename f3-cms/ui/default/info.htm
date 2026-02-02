@@ -1,0 +1,37 @@
+<div class="video-detail">
+    <h2>{{ @video.name }}</h2>
+    
+    <div class="video-meta">
+        <p><strong>类型:</strong> {{ @video.type }}</p>
+        <p><strong>年份:</strong> {{ @video.year }}</p>
+        <p><strong>地区:</strong> {{ @video.area }}</p>
+        <p><strong>演员:</strong> {{ @video.actor }}</p>
+        <p><strong>导演:</strong> {{ @video.director }}</p>
+        <p><strong>简介:</strong> {{ @video.des ?: @video.note }}</p>
+    </div>
+    
+    <div class="play-options">
+        <h3>播放来源</h3>
+        <repeat group="{{ @play_urls }}" value="{{ @play_url }}">
+            <div class="play-source">
+                <h4>{{ @play_url.name }}</h4>
+                <ul>
+                    <repeat group="{{ explode('#', @play_url.urls) }}" value="{{ @play_item }}">
+                        <check if="{{ @play_item }}">
+                            <true>
+                                <check if="{{ strpos(@play_item, '$') !== false }}">
+                                    <true>
+                                        <li>
+                                            <a href="/play/{{ @video.id }}/{{ trim(substr(@play_item, 0, strpos(@play_item, '$'))) }}?playertype=dplayer">DPlayer - {{ trim(substr(@play_item, 0, strpos(@play_item, '$'))) }}</a> |
+                                            <a href="/play/{{ @video.id }}/{{ trim(substr(@play_item, 0, strpos(@play_item, '$'))) }}?playertype=videojs">Video.js - {{ trim(substr(@play_item, 0, strpos(@play_item, '$'))) }}</a>
+                                        </li>
+                                    </true>
+                                </check>
+                            </true>
+                        </check>
+                    </repeat>
+                </ul>
+            </div>
+        </repeat>
+    </div>
+</div>

@@ -1,0 +1,103 @@
+<include href="layout.html" with="content=true">
+
+<!-- 面包屑导航 -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ @BASE }}" class="text-decoration-none">首页</a></li>
+        <li class="breadcrumb-item"><a href="{{ @BASE }}/category/{{ @video.tid }}" class="text-decoration-none">{{ @video.type }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ @video.name }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- 视频信息 -->
+    <div class="col-lg-3 mb-4">
+        <div class="card video-card">
+            <F3:check if="{{ @video.pic }}">
+                <img src="{{ @video.pic }}" alt="{{ @video.name }}" class="card-img-top">
+            </F3:check>
+            <F3:check if="{{ !@video.pic }}">
+                <img src="https://via.placeholder.com/300x400/333/666?text=No+Image" alt="{{ @video.name }}" class="card-img-top">
+            </F3:check>
+            <div class="card-body">
+                <h5 class="card-title">{{ @video.name }}</h5>
+                <p class="card-text">
+                    <span class="badge">{{ @video.type }}</span>
+                </p>
+                <F3:check if="{{ @video.episodes }}">
+                    <a href="{{ @BASE }}/play/{{ @video.id }}" class="btn btn-danger w-100">
+                        <i class="bi bi-play-circle"></i> 立即播放
+                    </a>
+                </F3:check>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详细信息 -->
+    <div class="col-lg-9">
+        <div class="info-section">
+            <h3 class="mb-4">{{ @video.name }}</h3>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-label">类型</div>
+                    <div class="info-value">{{ @video.type }}</div>
+
+                    <F3:check if="{{ @video.year }}">
+                        <div class="info-label">年份</div>
+                        <div class="info-value">{{ @video.year }}</div>
+                    </F3:check>
+
+                    <F3:check if="{{ @video.area }}">
+                        <div class="info-label">地区</div>
+                        <div class="info-value">{{ @video.area }}</div>
+                    </F3:check>
+
+                    <F3:check if="{{ @video.lang }}">
+                        <div class="info-label">语言</div>
+                        <div class="info-value">{{ @video.lang }}</div>
+                    </F3:check>
+                </div>
+
+                <div class="col-md-6">
+                    <F3:check if="{{ @video.director }}">
+                        <div class="info-label">导演</div>
+                        <div class="info-value">{{ @video.director }}</div>
+                    </F3:check>
+
+                    <F3:check if="{{ @video.actor }}">
+                        <div class="info-label">主演</div>
+                        <div class="info-value">{{ @video.actor }}</div>
+                    </F3:check>
+
+                    <div class="info-label">更新时间</div>
+                    <div class="info-value">{{ @video.last }}</div>
+
+                    <div class="info-label">状态</div>
+                    <div class="info-value">{{ @video.note }}</div>
+                </div>
+            </div>
+
+            <F3:check if="{{ @video.des }}">
+                <div class="info-label mt-3">剧情简介</div>
+                <div class="info-value">{{ @video.des }}</div>
+            </F3:check>
+        </div>
+
+        <!-- 剧集列表 -->
+        <F3:check if="{{ @video.episodes }}">
+            <div class="info-section">
+                <h4 class="mb-3">
+                    <i class="bi bi-collection-play"></i> 剧集列表
+                </h4>
+                <div class="episode-list">
+                    <F3:repeat group="{{ @video.episodes }}" key="{{ @key }}" value="{{ @episode }}">
+                        <a href="{{ @BASE }}/play/{{ @video.id }}/{{ @key }}" class="episode-btn">
+                            {{ @episode.name }}
+                        </a>
+                    </F3:repeat>
+                </div>
+            </div>
+        </F3:check>
+    </div>
+</div>

@@ -1,0 +1,447 @@
+
+/* 
+ * 影视视频网站 CSS样式表
+ * 基于Bootstrap 4.6.0
+ */
+
+/* ==================
+   全局样式
+   ================== */
+
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --border-radius: 0.375rem;
+}
+
+body {
+  font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* ==================
+   导航栏样式
+   ================== */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: 1px solid #e9ecef;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.navbar-brand i {
+  color: #ff6b6b;
+}
+
+.navbar .form-inline .input-group {
+  min-width: 300px;
+}
+
+.navbar .dropdown-menu {
+  min-width: 120px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ==================
+   卡片样式
+   ================== */
+.card {
+  border: none;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* 视频卡片特殊样式 */
+.video-thumb {
+  height: 200px;
+  object-fit: cover;
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+}
+
+.list-video-thumb {
+  height: 120px;
+  object-fit: cover;
+}
+
+/* 动画效果 */
+.hover-shadow {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.transition {
+  transition: all 0.3s ease;
+}
+
+/* ==================
+   视频详情页样式
+   ================== */
+.player-container {
+  background: #000;
+  position: relative;
+}
+
+.player-container iframe {
+  background: #000;
+}
+
+.episode-list .episode-btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s;
+}
+
+.episode-list .episode-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+.episode-list .episode-btn.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.video-description {
+  line-height: 1.8;
+  color: #555;
+  text-align: justify;
+}
+
+.video-description p {
+  margin-bottom: 1rem;
+}
+
+.current-episode-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ==================
+   分页样式
+   ================== */
+.pagination {
+  flex-wrap: wrap;
+}
+
+.pagination .page-link {
+  color: var(--dark-color);
+  border: 1px solid #dee2e6;
+  margin: 0 2px;
+  border-radius: 0.25rem !important;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.pagination .page-link:hover {
+  background-color: #f8f9fa;
+  color: var(--primary-color);
+}
+
+/* ==================
+   轮播和横幅样式
+   ================== */
+.jumbotron {
+  border-radius: var(--border-radius);
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.jumbotron::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+  z-index: 0;
+}
+
+.jumbotron .container {
+  position: relative;
+  z-index: 1;
+}
+
+.bg-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* ==================
+   搜索和筛选样式
+   ================== */
+.search-highlight {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
+}
+
+mark {
+  background-color: #fff34d;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
+  font-weight: 600;
+}
+
+/* 热词标签 */
+.hot-keyword {
+  transition: all 0.2s;
+}
+
+.hot-keyword:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* ==================
+   页脚样式
+   ================== */
+.footer {
+  margin-top: 4rem;
+  border-top: 1px solid #dee2e6;
+  background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+}
+
+.footer h5 {
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* ==================
+   模态框样式
+   ================== */
+.modal-content {
+  border-radius: var(--border-radius);
+  border: none;
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+}
+
+/* ==================
+   返回顶部按钮
+   ================== */
+#backToTop {
+  width: 40px;
+  height: 40px;
+  opacity: 0.8;
+  transition: all 0.3s;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+#backToTop:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+#backToTop i {
+  font-size: 0.875rem;
+}
+
+/* ==================
+   进度条和加载器
+   ================== */
+.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2rem;
+  height: 2rem;
+  margin: -1rem 0 0 -1rem;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 1000;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==================
+   响应式样式
+   ================== */
+
+/* 小屏幕优化 */
+@media (max-width: 575.98px) {
+  .navbar .form-inline .input-group {
+    min-width: auto;
+    margin-top: 0.5rem;
+  }
+  
+  .video-thumb {
+    height: 160px;
+  }
+  
+  .list-video-thumb {
+    height: 100px;
+  }
+  
+  .player-container iframe {
+    height: 250px;
+  }
+  
+  .jumbotron {
+    margin: 1rem -0.5rem;
+  }
+  
+  .episode-list .col-6 {
+    padding: 0 0.25rem;
+  }
+}
+
+/* 中等屏幕优化 */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .video-thumb {
+    height: 180px;
+  }
+  
+  .player-container iframe {
+    height: 400px;
+  }
+  
+  .list-video-thumb {
+    height: 110px;
+  }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1200px) {
+  .video-thumb {
+    height: 220px;
+  }
+  
+  .episode-list .episode-btn {
+    font-size: 0.9rem;
+  }
+}
+
+/* ==================
+   辅助工具类
+   ================== */
+
+/* 阴影效果 */
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.shadow {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
+
+/* 文字截断 */
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-truncate-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 背景透明度 */
+.bg-opacity-75 {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* 间距工具 */
+.mb-6 {
+  margin-bottom: 4rem !important;
+}
+
+.mt-6 {
+  margin-top: 4rem !important;
+}
+
+/* 特殊效果 */
+.glow {
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+  }
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

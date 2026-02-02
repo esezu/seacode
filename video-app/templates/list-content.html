@@ -1,0 +1,54 @@
+<check if="!empty(@title)">
+    <h2 class="section-title">{{ @title }}</h2>
+</check>
+
+<div class="video-grid">
+    <repeat group="{{ @videos }}" key="{{ @key }}" value="{{ @video }}">
+        <article class="video-card">
+            <a href="{{ @BASEURL }}/detail/{{ @video.id }}" class="video-card-link">
+                <div class="video-poster">
+                    <check if="!empty(@video.pic)">
+                        <img src="{{ @video.pic }}" alt="{{ @video.name }}" loading="lazy">
+                    <else/>
+                        <div class="poster-placeholder">
+                            <span class="placeholder-text">{{ @video.name }}</span>
+                        </div>
+                    </check>
+                    <div class="video-overlay">
+                        <span class="play-icon">▶</span>
+                    </div>
+                </div>
+                <h3 class="video-title">{{ @video.name }}</h3>
+            </a>
+            <div class="video-meta">
+                <span class="video-type">{{ @video.type }}</span>
+                <span class="video-note">{{ @video.note }}</span>
+                <span class="video-date">{{ substr(@video.last, 0, 10) }}</span>
+            </div>
+        </article>
+    </repeat>
+</div>
+
+<check if="!empty(@pagination) && @pagination.pagecount > 1">
+    <div class="pagination">
+        <check if="@pagination.page > 1">
+            <a href="?pg=1&t={{ @type_id }}" class="pagination-link">首页</a>
+            <a href="?pg={{ @pagination.page - 1 }}&t={{ @type_id }}" class="pagination-link">上一页</a>
+        </check>
+
+        <span class="pagination-info">
+            第 {{ @pagination.page }} / {{ @pagination.pagecount }} 页
+        </span>
+
+        <check if="@pagination.page < @pagination.pagecount">
+            <a href="?pg={{ @pagination.page + 1 }}&t={{ @type_id }}" class="pagination-link">下一页</a>
+            <a href="?pg={{ @pagination.pagecount }}&t={{ @type_id }}" class="pagination-link">末页</a>
+        </check>
+    </div>
+</check>
+
+<check if="empty(@videos)">
+    <div class="empty-state">
+        <p>暂无视频数据</p>
+    </div>
+</check>

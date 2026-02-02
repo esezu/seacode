@@ -1,0 +1,129 @@
+<ignore>
+<!-- 通用分页组件 
+支持变量：
+- current_page: 当前页码
+- total_pages: 总页数
+- base_url: 基础URL（可选）
+-->
+</ignore>
+
+{{ 
+  @current_page = @current_page ?? @videos.page ?? 1;
+  @total_pages = @total_pages ?? @videos.pagecount ?? 1;
+  @base_url = @base_url ?? @_SERVER.REQUEST_URI;
+  @params = @_GET ?: [];
+  
+  // 清理页码参数
+  if(isset(@params['pg'])) {
+    unset(@params['pg']);
+  }
+  if(isset(@params['p'])) {
+    unset(@params['p']);
+  }
+}}
+
+<check if="{{ @total_pages <= 1 }}">
+  <exit />
+</check>
+
+<nav aria-label="Page navigation" class="d-flex justify-content-center">
+  <ul class="pagination pagination-sm">
+    
+    <!-- 上一页 -->
+    <li class="page-item {{ @current_page <= 1 ? 'disabled' : '' }}">
+      <a class="page-link" 
+         href="{{ @base_url }}{{ !empty(@params) ? '?' . http_build_query(@params) . '&' : '?' }}pg={{ @current_page - 1 }}"
+         aria-label="上一页">
+        <span aria-hidden="true">&laquo;</span>
+        <span class="sr-only">上一页</span>
+      </a>
+    </li>
+    
+    <!-- 第一页 -->
+    <li class="page-item {{ @current_page == 1 ? 'active' : '' }}">
+      <a class="page-link" 
+         href="{{ @base_url }}{{ !empty(@params) ? '?' . http_build_query(@params) . '&' : '?' }}pg=1">
+        1
+      </a>
+    </li>
+    
+    <!-- 省略号 - 前面 -->
+    <check if="{{ @current_page > 4 }}">
+      <li class="page-item disabled">
+        <span class="page-link">...</span>
+      </li>
+    </check>
+    
+    <!-- 中间页码 -->
+    <set @start = max(2, @current_page - 2) />
+    <set @end = min(@total_pages - 1, @current_page + 2) />
+    
+    <loop from="{{ @start }}" to="{{ @end }}" value="@i">
+      <li class="page-item {{ @i == @current_page ? 'active' : '' }}">
+        <a class="page-link" 
+           href="{{ @base_url }}{{ !empty(@params) ? '?' . http_build_query(@params) . '&' : '?' }}pg={{ @i }}">
+          {{ @i }}
+        </a>
+      </li>
+    </loop>
+    
+    <!-- 省略号 - 后面 -->
+    <check if="{{ @current_page < @total_pages - 3 }}">
+      <li class="page-item disabled">
+        <span class="page-link">...</span>
+      </li>
+    </check>
+    
+    <!-- 最后一页 -->
+    <check if="{{ @total_pages > 1 }}">
+      <li class="page-item {{ @current_page == @total_pages ? 'active' : '' }}">
+        <a class="page-link" 
+           href="{{ @base_url }}{{ !empty(@params) ? '?' . http_build_query(@params) . '&' : '?' }}pg={{ @total_pages }}">
+          {{ @total_pages }}
+        </a>
+      </li>
+    </check>
+    
+    <!-- 下一页 -->
+    <li class="page-item {{ @current_page >= @total_pages ? 'disabled' : '' }}">
+      <a class="page-link" 
+         href="{{ @base_url }}{{ !empty(@params) ? '?' . http_build_query(@params) . '&' : '?' }}pg={{ @current_page + 1 }}"
+         aria-label="下一页">
+        <span aria-hidden="true">&raquo;</span>
+        <span class="sr-only">下一页</span>
+      </a>
+    </li>
+    
+  </ul>
+</nav>
+
+<!-- 页码跳转 -->
+<nav aria-label="Page navigation" class="d-flex justify-content-center mt-3">
+  <form class="form-inline" method="get" onsubmit="return jumpToPage(this);">
+    
+    <!-- 保留原参数 -->
+    <repeat group="@params" key="@key" value="@value">
+      <input type="hidden" name="{{ @key }}" value="{{ @value }}" />
+    </repeat>
+    
+    <div class="input-group input-group-sm">
+      <input type="number" 
+             class="form-control" 
+             name="pg" 
+             min="1" 
+             max="{{ @total_pages }}"
+             value="{{ @current_page }}"
+             placeholder="页码"
+             style="width: 80px;"
+             required>
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="submit">
+          跳转
+        </button>
+      </div>
+    </div>
+    <small class="form-text text-muted ml-2">
+      共 {{ @total_pages }} 页
+    </small>
+  </form>
+</nav>

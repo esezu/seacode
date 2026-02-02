@@ -1,0 +1,33 @@
+# .htaccess - Apache 配置文件
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 设置基础目录
+    RewriteBase /
+
+    # 重定向所有请求到 index.php（除非是静态文件）
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# 设置默认文档
+DirectoryIndex index.php
+
+# 安全设置
+<Files ".htaccess">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "*.ini">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# 禁止目录浏览
+Options -Indexes
+
+# 设置字符集
+AddDefaultCharset UTF-8

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ @title }} - M3U8视频播放器</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #e50914;
+            --secondary-color: #141414;
+            --text-color: #ffffff;
+            --bg-color: #000000;
+            --card-bg: #1a1a1a;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background-color: var(--secondary-color);
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link {
+            color: #ccc;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .video-card {
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .video-card .card-body {
+            padding: 15px;
+        }
+
+        .video-card .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .video-card .card-text {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .video-card .badge {
+            background-color: var(--primary-color);
+            font-size: 0.75rem;
+        }
+
+        .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .category-btn {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .category-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination-custom {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .pagination-custom .page-link {
+            background-color: #333;
+            border-color: #444;
+            color: #fff;
+        }
+
+        .pagination-custom .page-link:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .pagination-custom .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .search-box {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-box input {
+            background-color: #333;
+            border-color: #444;
+            color: #fff;
+        }
+
+        .search-box input:focus {
+            background-color: #444;
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(229, 9, 20, 0.25);
+        }
+
+        .search-box button {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .search-box button:hover {
+            background-color: #c40812;
+            border-color: #c40812;
+        }
+
+        .player-container {
+            background-color: #000;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .episode-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .episode-btn {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .episode-btn:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .episode-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .info-section {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-label {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .alert-custom {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #fff;
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid #333;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .video-card img {
+                height: 180px;
+            }
+
+            .category-btn {
+                padding: 5px 12px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{{ @BASE }}">
+                <i class="bi bi-play-circle-fill"></i> M3U8播放器
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ @BASE }}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ @BASE }}/category/1">电视剧</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ @BASE }}/category/2">电影</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ @BASE }}/category/24">动漫</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ @BASE }}/category/30">综艺</a>
+                    </li>
+                </ul>
+                <form class="d-flex" action="{{ @BASE }}/search" method="GET">
+                    <input class="form-control me-2" type="search" name="wd" placeholder="搜索视频..." value="{{ @searchKeyword }}">
+                    <button class="btn btn-danger" type="submit">搜索</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区 -->
+    <main class="container py-4">
+        <F3:check if="{{ @error }}">
+            <div class="alert alert-danger alert-custom" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i> {{ @error }}
+            </div>
+        </F3:check>
+
+        <F3:check if="{{ @success }}">
+            <div class="alert alert-success alert-custom" role="alert">
+                <i class="bi bi-check-circle-fill"></i> {{ @success }}
+            </div>
+        </F3:check>
+
+        {{ @content | raw }}
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container text-center">
+            <p class="mb-2">M3U8视频播放器 - 纯净播放体验</p>
+            <p class="mb-0 text-muted small">本站仅供学习交流使用，视频资源来源于网络</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

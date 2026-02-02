@@ -1,0 +1,55 @@
+<!-- 搜索框 -->
+<div class="search-box">
+    <form method="GET" action="/search">
+        <input type="text" name="wd" value="{{ @wd }}" placeholder="请输入关键词搜索..." />
+        <input type="submit" value="搜索" />
+    </form>
+</div>
+
+<!-- 搜索结果 -->
+<div class="video-list">
+    <repeat group="{{ @list }}" value="{{ @item }}">
+        <div class="video-item">
+            <div class="video-title">
+                <a href="/info/{{ @item.id }}">{{ @item.name }}</a>
+            </div>
+            <div class="video-info">
+                类型: {{ @item.type }} | 年份: {{ @item.year }} | 地区: {{ @item.area }}
+            </div>
+            <div class="video-info">
+                主演: {{ @item.actor }}
+            </div>
+            <div class="video-info">
+                简介: {{ @item.note ?: @item.des }}
+            </div>
+        </div>
+    </repeat>
+</div>
+
+<!-- 分页 -->
+<div class="pagination">
+    <check if="{{ isset(@page) }}">
+        <true>
+            <check if="{{ @page > 1 }}">
+                <true>
+                    <a href="{{ @REALM }}search?wd={{ @wd }}&page={{ @page - 1 }}">上一页</a>
+                </true>
+            </check>
+            
+            <repeat from="{{ @start_page }}" to="{{ @end_page }}" counter="i">
+                <check if="{{ @i == @page }}">
+                    <span class="current">{{ @i }}</span>
+                <false>
+                    <a href="{{ @REALM }}search?wd={{ @wd }}&page={{ @i }}">{{ @i }}</a>
+                </false>
+                </check>
+            </repeat>
+            
+            <check if="{{ @page < @total }}">
+                <true>
+                    <a href="{{ @REALM }}search?wd={{ @wd }}&page={{ @page + 1 }}">下一页</a>
+                </true>
+            </check>
+        </true>
+    </check>
+</div>

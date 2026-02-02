@@ -1,0 +1,20 @@
+<h2>全部分类</h2>
+
+<check if="{{ @categories }}">
+    <check if="{{ count(@categories) > 0 }}">
+        <div class="category-list">
+            <repeat group="{{ @categories }}" value="{{ @cat }}" key="{{ @cat_id }}">
+                <a href="/category/{{ @cat_id }}" class="category-item">
+                    <div class="name">{{ @cat }}</div>
+                </a>
+            </repeat>
+        </div>
+    <false>
+        <div class="empty">
+            <h3>暂无分类数据</h3>
+            <p>请稍后再试</p>
+        </div>
+    </check>
+<false>
+    <div class="loading">加载中...</div>
+</check>

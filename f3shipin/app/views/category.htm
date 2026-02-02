@@ -1,0 +1,314 @@
+
+
+
+
+<!-- 继承基础布局 -->
+<include href="layout.htm" />
+
+<ignore>
+<!-- 分类页面模板 -->
+</ignore>
+
+{{ @content = "
+
+<!-- 页面标题 -->
+<div class="page-header mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light">
+            <li class="breadcrumb-item">
+                <a href="{@config.base_url}/"><i class="fas fa-home"></i> 首页</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{@config.base_url}/list"><i class="fas fa-list"></i> 全部视频</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-th-large"></i> {{ @category_name ?: '未知分类' }}
+            </li>
+        </ol>
+    </nav>
+    
+    <h2>
+        <i class="fas fa-th-large text-primary"></i> {{ @category_name }}
+        <small class="text-muted ml-2">(ID: {{ @category_id }})</small>
+    </h2>
+    <p class="text-muted">
+        浏览 <strong>{{ @category_name }}</strong> 分类下的所有视频内容
+    </p>
+</div>
+
+<!-- 分类导航快捷方式 -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h6 class="mb-0">
+            <i class="fas fa-exchange-alt"></i> 快速切换分类
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <repeat group="@categories" value="@cat">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                    <a href="{@config.base_url}/category/{@cat.id}" 
+                       class="btn btn-sm btn-block {{ @cat.id == @category_id ? 'btn-primary' : 'btn-outline-primary' }}">
+                        <check if="{{ @cat.id == @category_id }}">
+                            <i class="fas fa-check text-white mr-1"></i>
+                        </check>
+                        {{ @cat.name }}
+                    </a>
+                </div>
+            </repeat>
+        </div>
+    </div>
+</div>
+
+<!-- 错误处理 -->
+<check if="{{ isset(@videos.error) }}">
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="fas fa-exclamation-triangle"></i> 
+        <strong>数据加载失败：</strong> {@videos.error}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    </div>
+</check>
+
+<!-- 视频内容展示 -->
+<check if="{{ !isset(@videos.error) }}">
+    
+    <!-- 统计信息 -->
+    <div class="alert alert-info shadow-sm">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <i class="fas fa-chart-bar mr-2"></i>
+                <strong>{{ @category_name }}</strong> 分类下共有 
+                <strong>{{ @videos.recordcount }}</strong> 个视频
+            </div>
+            <div class="col-md-6 text-md-right">
+                <small>
+                    第 {{ @videos.page }} 页 / 共 {{ @videos.pagecount }} 页
+                    (每页 {{ @videos.pagesize }} 项)
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 排序和筛选选项 -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="mb-0 font-weight-bold mr-2">显示方式：</label>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary active" id="gridViewToggle">
+                            <i class="fas fa-th"></i> 网格
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="listViewToggle">
+                            <i class="fas fa-list"></i> 列表
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-right">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> 数据实时更新，包含最新资源
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 视频列表 -->
+    <check if="{{ count(@videos.videos) > 0 }}">
+        
+        <!-- 网格视图 -->
+        <div id="gridView">
+            <div class="row">
+                <repeat group="@videos.videos" value="@video" key="@key">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2 mb-4">
+                        <div class="card h-100 shadow-sm hover-shadow transition">
+                            <a href="{@config.base_url}/video/{@video.id}" 
+                               class="text-decoration-none position-relative">
+                                <img src="{{ @video.pic ?: '//via.placeholder.com/300x400/6c757d/fff?text=' . urlencode(@video.name) }}" 
+                                     class="card-img-top video-thumb" 
+                                     alt="{{ @video.name }}"
+                                     loading="lazy"
+                                     onerror="this.src='//via.placeholder.com/300x400/6c757d/fff?text=图片失效'">
+                                
+                                <!-- 状态标签 -->
+                                <div class="position-absolute" style="top: 6px; right: 6px; z-index: 10;">
+                                    <span class="badge badge-success badge-pill shadow-sm">
+                                        {{ @video.note }}
+                                    </span>
+                                </div>
+                                
+                                <!-- 视频时长标签 (可选显示) -->
+                                <check if="{{ !empty(@video.last) }}">
+                                    <div class="position-absolute" style="bottom: 8px; left: 8px; z-index: 10;">
+                                        <small class="badge badge-dark bg-opacity-75">
+                                            <i class="far fa-clock"></i> 
+                                            {{ date('m-d', strtotime(@video.last)) }}
+                                        </small>
+                                    </div>
+                                </check>
+                                
+                                <div class="card-body p-2">
+                                    <h6 class="card-title mb-1 text-dark small font-weight-bold text-truncate" 
+                                        title="{{ @video.name }}">
+                                        {{ @video.name }}
+                                    </h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <small class="text-muted">{{ @video.type }}</small>
+                                        <check if="{{ !empty(@video.year) }}">
+                                            <small class="text-muted">{{ @video.year }}</small>
+                                        </check>
+                                    </div>
+                                    <check if="{{ !empty(@video.actor) }}">
+                                        <small class="text-muted d-block text-truncate" 
+                                              title="{{ @video.actor }}">
+                                            <i class="fas fa-user-friends mr-1"></i>
+                                            {{ @video.actor | format_actor | truncate(12) }}
+                                        </small>
+                                    </check>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 响应式换行 -->
+                    <check if="{{ @key > 0 && @key % 6 == 5 }}">
+                        </div><div class="row">
+                    </check>
+                </repeat>
+            </div>
+        </div>
+
+        <!-- 列表视图 -->
+        <div id="listView" style="display: none;">
+            <div class="row">
+                <repeat group="@videos.videos" value="@video">
+                    <div class="col-12 mb-3">
+                        <div class="card shadow-sm">
+                            <div class="row no-gutters">
+                                <div class="col-4 col-sm-3 col-md-3 col-lg-2">
+                                    <a href="{@config.base_url}/video/{@video.id}">
+                                        <img src="{{ @video.pic ?: '//via.placeholder.com/150x200/6c757d/fff?text=' . urlencode(@video.name) }}" 
+                                             class="img-fluid rounded-left list-thumb" 
+                                             alt="{{ @video.name }}"
+                                             onerror="this.src='//via.placeholder.com/150x200/6c757d/fff?text=图片失效'"
+                                             style="object-fit: cover; width: 100%; height: 100%; min-height: 120px;">
+                                    </a>
+                                </div>
+                                <div class="col-8 col-sm-9 col-md-9 col-lg-10">
+                                    <div class="card-body py-2 px-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h5 class="card-title mb-1">
+                                                    <a href="{@config.base_url}/video/{@video.id}" 
+                                                       class="text-decoration-none text-dark font-weight-bold">
+                                                        {{ @video.name }}
+                                                    </a>
+                                                </h5>
+                                                
+                                                <!-- 标签信息 -->
+                                                <div class="mb-2">
+                                                    <span class="badge badge-secondary mr-2">{{ @video.type }}</span>
+                                                    <span class="badge badge-success mr-2">{{ @video.note }}</span>
+                                                    <check if="{{ !empty(@video.year) }}">
+                                                        <span class="badge badge-info">{{ @video.year }}年</span>
+                                                    </check>
+                                                </div>
+                                                
+                                                <!-- 演员和导演 -->
+                                                <div class="small text-muted">
+                                                    <check if="{{ !empty(@video.actor) }}">
+                                                        <p class="mb-1">
+                                                            <i class="fas fa-user-friends mr-1"></i>
+                                                            <strong>主演：</strong>{{ @video.actor | format_actor | truncate(30) }}
+                                                        </p>
+                                                    </check>
+                                                    <check if="{{ !empty(@video.director) }}">
+                                                        <p class="mb-1">
+                                                            <i class="fas fa-video mr-1"></i>
+                                                            <strong>导演：</strong>{{ @video.director }}
+                                                        </p>
+                                                    </check>
+                                                    <p class="mb-0">
+                                                        <i class="far fa-clock mr-1"></i>
+                                                        更新：{{ date('Y-m-d', strtotime(@video.last)) }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </repeat>
+            </div>
+        </div>
+
+        <!-- 分页导航 -->
+        <div class="mt-5">
+            <include href="pagination.htm" />
+        </div>
+
+    </check>
+    
+    <!-- 无数据提示 -->
+    <check if="{{ count(@videos.videos) == 0 }}">
+        <div class="text-center py-5">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-circle fa-3x mb-3 text-warning"></i>
+                <h5>{{ @category_name }} 分类下暂无视频</h5>
+                <p class="mb-3">该分类可能还在收集中，或暂未收录相关资源</p>
+                
+                <!-- 快捷操作 -->
+                <div>
+                    <a href="{@config.base_url}/list" class="btn btn-primary mr-2">
+                        <i class="fas fa-list"></i> 浏览全部视频
+                    </a>
+                    <a href="{@config.base_url}/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> 返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </check>
+
+</check>
+
+<!-- 侧边栏统计信息 -->
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <h6 class="card-title border-bottom pb-2">
+            <i class="fas fa-chart-line text-primary"></i> 分类统计
+        </h6>
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <div class="text-center">
+                    <h5 class="text-primary">{{ count(@categories) }}</h5>
+                    <small class="text-muted">总分类数</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-center">
+                    <h5 class="text-success">{{ @videos.recordcount }}</h5>
+                    <small class="text-muted">{{ @category_name }}视频数</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-center">
+                    <h5 class="text-info">{{ @videos.pagecount }}</h5>
+                    <small class="text-muted">总页数</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-center">
+                    <h5 class="text-warning">{{ date('m-d') }}</h5>
+                    <small class="text-muted">更新日期</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+" }}

@@ -1,0 +1,62 @@
+<h2>搜索结果：{{ @GET.wd }}</h2>
+
+<div class="search-results">
+    <check if="{{ @GET.wd }}">
+        <div class="search-keyword">
+            搜索关键词："{{ @GET.wd }}"
+            <check if="{{ @total }}">
+                <span>（找到 {{ @total }} 个结果）</span>
+            </check>
+        </div>
+    </check>
+
+    <check if="{{ @videos }}">
+        <check if="{{ count(@videos) > 0 }}">
+            <div class="video-grid">
+                <repeat group="{{ @videos }}" value="{{ @video }}">
+                    <div class="video-card" onclick="location.href='/info/{{ @video.id }}'">
+                        <img class="pic" src="{{ @video.pic }}" alt="{{ @video.name }}" onerror="this.src='https://via.placeholder.com/300x400/f5f5f5/999999?text=暂无封面'">
+                        <div class="info">
+                            <div class="name">{{ @video.name }}</div>
+                            <div class="meta">
+                                <span>{{ @video.year }}</span> | <span>{{ @video.area }}</span>
+                            </div>
+                            <check if="{{ @video.note }}">
+                                <div class="note">{{ @video.note }}</div>
+                            </check>
+                        </div>
+                    </div>
+                </repeat>
+            </div>
+
+            <!-- 分页 -->
+            <check if="{{ @pagination.pagecount > 1 }}">
+                <div class="pagination">
+                    <check if="{{ @pagination.page > 1 }}">
+                        <a href="/search/1?wd={{ @GET.wd }}">首页</a>
+                        <a href="/search/{{ @pagination.page - 1 }}?wd={{ @GET.wd }}">上一页</a>
+                    </check>
+
+                    <span class="current">第 {{ @pagination.page }} 页</span>
+                    <span>/</span>
+                    <span>共 {{ @pagination.pagecount }} 页</span>
+
+                    <check if="{{ @pagination.page < @pagination.pagecount }}">
+                        <a href="/search/{{ @pagination.page + 1 }}?wd={{ @GET.wd }}">下一页</a>
+                        <a href="/search/{{ @pagination.pagecount }}?wd={{ @GET.wd }}">尾页</a>
+                    </check>
+                </div>
+            </check>
+        <false>
+            <div class="empty">
+                <h3>抱歉，没有找到相关视频</h3>
+                <p>请尝试其他搜索关键词</p>
+            </div>
+        </check>
+    <false>
+        <div class="loading">
+            <h3>输入搜索关键词开始搜索</h3>
+            <p>支持搜索视频名称、演员、导演等信息</p>
+        </div>
+    </check>
+</div>

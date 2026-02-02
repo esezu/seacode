@@ -1,0 +1,251 @@
+
+
+<!-- 继承基础布局 -->
+<include href="layout.htm" />
+
+<ignore>
+<!-- 视频详情页面 -->
+</ignore>
+
+{{ @content = "
+
+<check if="{{ isset(@video.error) }}">
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> {@video.error}
+        <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary ml-3">
+            <i class="fas fa-arrow-left"></i> 返回
+        </a>
+    </div>
+</check>
+
+<check if="{{ !isset(@video.error) }}">
+
+    <!-- 视频信息主卡片 -->
+    <div class="row mb-4">
+        <div class="col-md-4 col-lg-3 mb-4 mb-md-0">
+            <!-- 视频海报 -->
+            <div class="card shadow">
+                <img src="{{ @video.pic ?: '//via.placeholder.com/400x600/6c757d/fff?text=' . urlencode(@video.name) }}" 
+                     class="card-img-top img-fluid" 
+                     alt="{{ @video.name }}"
+                     onerror="this.src='//via.placeholder.com/400x600/6c757d/fff?text=图片失效'"
+                     style="object-fit: cover; max-height: 400px;">
+            </div>
+        </div>
+        
+        <div class="col-md-8 col-lg-9">
+            <!-- 视频信息 -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="card-title mb-3 text-primary">
+                        {{ @video.name }}
+                        <check if="{{ !empty(@video.year) }}">
+                            <small class="text-muted font-weight-normal">（{{ @video.year }}年）</small>
+                        </check>
+                    </h1>
+                    
+                    <!-- 基本信息标签 -->
+                    <div class="mb-3">
+                        <span class="badge badge-primary mr-2">{{ @video.type }}</span>
+                        <span class="badge badge-success mr-2">{{ @video.note }}</span>
+                        
+                        <check if="{{ !empty(@video.area) }}">
+                            <span class="badge badge-info mr-2">地区：{{ @video.area }}</span>
+                        </check>
+                        
+                        <check if="{{ !empty(@video.lang) }}">
+                            <span class="badge badge-secondary mr-2">语言：{{ @video.lang }}</span>
+                        </check>
+                        
+                        <span class="badge badge-warning">
+                            <i class="far fa-clock"></i> 更新：{{ date('Y-m-d', strtotime(@video.last)) }}
+                        </span>
+                    </div>
+                    
+                    <!-- 演员信息 -->
+                    <check if="{{ !empty(@video.actor) }}">
+                        <div class="mb-2">
+                            <i class="fas fa-user-friends text-secondary mr-2"></i>
+                            <strong>主演：</strong>
+                            <span class="text-muted">{{ @video.actor | format_actor }}</span>
+                        </div>
+                    </check>
+                    
+                    <!-- 导演信息 -->
+                    <check if="{{ !empty(@video.director) }}">
+                        <div class="mb-2">
+                            <i class="fas fa-video text-secondary mr-2"></i>
+                            <strong>导演：</strong>
+                            <span class="text-muted">{{ @video.director }}</span>
+                        </div>
+                    </check>
+                    
+                    <!-- 连载状态 -->
+                    <div class="mb-3">
+                        <i class="fas fa-tv text-secondary mr-2"></i>
+                        <strong>状态：</strong>
+                        <span class="text-success">{{ @video.state == '1' ? '已完结' : (@video.note ? @video.note : '连载中') }}</span>
+                    </div>
+                    
+                    <!-- 播放按钮 -->
+                    <div class="mb-4">
+                        <check if="{{ count(@video.episodes) > 0 }}">
+                            <button type="button" class="btn btn-danger btn-lg mr-2" id="playFirstEpisode">
+                                <i class="fas fa-play"></i> 立即播放第一集
+                            </button>
+                        </check>
+                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#shareModal">
+                            <i class="fas fa-share-alt"></i> 分享
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 剧情简介 -->
+            <check if="{{ !empty(@video.des) }}">
+                <div class="card mt-4 shadow">
+                    <div class="card-body">
+                        <h5 class="card-title border-bottom pb-2">
+                            <i class="fas fa-file-alt"></i> 剧情简介
+                        </h5>
+                        <div class="video-description">
+                            {{ nl2br(htmlspecialchars(@video.des)) | raw }}
+                        </div>
+                    </div>
+                </div>
+            </check>
+        </div>
+    </div>
+
+    <!-- 播放列表 -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-list-ol"></i> 播放列表 
+                <small class="ml-2">(共 {{ count(@video.episodes) }} 集)</small>
+            </h5>
+        </div>
+        <div class="card-body">
+            <check if="{{ count(@video.episodes) > 0 }}">
+                <!-- 播放工具 -->
+                <div class="mb-3">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary" id="selectAllEpisodes">
+                            全选
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="clearSelection">
+                            清空
+                        </button>
+                    </div>
+                    <small class="text-muted ml-3">提示：点击集数直接播放</small>
+                </div>
+                
+                <!-- 集数列表 -->
+                <div class="row episode-list">
+                    <repeat group="@video.episodes" value="@episode" key="@index">
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2">
+                            <div class="episode-item">
+                                <button type="button" 
+                                        class="btn btn-outline-primary btn-sm btn-block text-truncate episode-btn" 
+                                        data-url="{{ @episode.url }}"
+                                        data-title="{{ @episode.title }}"
+                                        title="{{ @episode.title }}">
+                                    {{ @episode.title }}
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 响应式换行 -->
+                        <check if="{{ @index > 0 && @index % 12 == 11 }}">
+                            </div><div class="row episode-list">
+                        </check>
+                    </repeat>
+                </div>
+            </check>
+            
+            <check if="{{ count(@video.episodes) == 0 }}">
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-video-slash fa-2x mb-2"></i>
+                    <p>暂无播放资源</p>
+                </div>
+            </check>
+        </div>
+    </div>
+
+    <!-- M3U8播放器 -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-play-circle"></i> 视频播放器
+            </h5>
+            <span class="current-episode-title"></span>
+        </div>
+        <div class="card-body p-0">
+            <div class="player-container">
+                <!-- 播放器嵌入 -->
+                <iframe id="m3u8Player" 
+                        src="" 
+                        style="width: 100%; height: 500px; border: none;" 
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-presentation">
+                </iframe>
+                
+                <!-- 播放器加载提示 -->
+                <div id="playerLoader" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                    <p class="text-muted mb-0">正在加载播放器...</p>
+                </div>
+                
+                <!-- 播放器错误提示 -->
+                <div id="playerError" class="alert alert-danger m-3" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i> 
+                    <span id="errorMessage">加载失败，请稍后重试</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分享模态框 -->
+    <div class="modal fade" id="shareModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">分享视频</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>分享链接：</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="shareUrl" 
+                                   value="{BASE_URL}/video/{@video.id}" readonly>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" 
+                                        onclick="copyShareUrl()">复制</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle"></i> 将此链接分享给朋友即可一起观看
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 相关推荐区域 -->
+    <div class="recommended-section">
+        <h4 class="border-bottom pb-2 mb-3">
+            <i class="fas fa-thumbs-up"></i> 相关推荐
+        </h4>
+        <!-- 这里可以添加相关推荐逻辑 -->
+        <div class="text-center text-muted">
+            <i class="fas fa-lightbulb"></i> 更多精彩内容，请浏览其他分类
+        </div>
+    </div>
+
+</check>
+
+" }}

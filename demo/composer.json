@@ -1,0 +1,13 @@
+{
+    "name": "video-app/fatfree",
+    "description": "M3U8 Video Player using Fat-Free Framework",
+    "require": {
+        "php": ">=7.4",
+        "bcosca/fatfree-core": "^3.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}
